@@ -41,6 +41,12 @@ export async function saveCallData(call: CallData) {
   const callId = call.id || 'unknown';
   
   try {
+    // Check if database is available
+    if (!process.env.POSTGRES_URL) {
+      console.log(`⚠️ [${callId}] No database connection available, skipping save`);
+      return { success: false, id: callId, error: 'No database connection' };
+    }
+    
     console.log(`💽 [${new Date().toISOString()}] Starting database save for call:`, {
       id: callId,
       caller: call.caller_name,
@@ -172,6 +178,12 @@ interface DBCallRow {
 // Get all calls from the database
 export async function getAllCalls(): Promise<CallData[]> {
   try {
+    // Check if database is available
+    if (!process.env.POSTGRES_URL) {
+      console.log('🔍 No database connection available, returning empty array');
+      return [];
+    }
+    
     console.log('🔍 Fetching all calls from database...');
     const result = await sql`
       SELECT * FROM calls 

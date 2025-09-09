@@ -1,20 +1,22 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { CallData, saveCallData, getAllCalls } from '@/lib/webhook-service';
-import { initDB } from '@/lib/db';
 
-// Initialize database on server start
-initDB().catch(error => {
-  console.error('❌ Failed to initialize database:', error);
-  // In production, we don't want to crash the server if DB init fails
-  // as it might be a temporary issue, but we should log it
-  if (process.env.NODE_ENV !== 'production') {
-    // In development, crash to make the issue more visible
-    console.error('🚨 Fatal: Database initialization failed in development');
-    process.exit(1);
-  } else {
-    console.error('⚠️  Database initialization failed, but continuing in production');
+// Initialize database only when needed, not on import
+let dbInitialized = false;
+
+async function ensureDbInitialized() {
+  if (!dbInitialized && process.env.POSTGRES_URL) {
+    try {
+      const { initDB } = await import('@/lib/db');
+      await initDB();
+      dbInitialized = true;
+      console.log('✅ Database initialized successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize database:', error);
+      // Don't throw error to prevent build failures
+    }
   }
-});
+}
 
 // Helper function to generate unique request ID
 function generateRequestId() {
@@ -48,10 +50,13 @@ function createErrorResponse(error: string, status: number, requestId: string, d
   );
 }
 
-// POST /api/webhook - Receive webhook data from Make.com
+// POST /api/webhook - Receive webhook data from Ultravox AI
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
   logRequest(request, requestId);
+  
+  // Ensure database is initialized
+  await ensureDbInitialized();
   
   // Log request start
   const startTime = Date.now();
@@ -318,6 +323,9 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
   logRequest(request, requestId);
+  
+  // Ensure database is initialized
+  await ensureDbInitialized();
   
   try {
     console.log(`🔍 [${requestId}] Fetching all call records...`);
