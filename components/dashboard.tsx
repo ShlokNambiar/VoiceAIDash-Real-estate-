@@ -6,19 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { 
   Clock, 
-  Phone, 
-  BarChart3, 
-  Calendar, 
-  CheckCircle, 
   RefreshCw, 
-  IndianRupee,
   LineChart, 
   PieChart,
   AlertCircle,
   Building2,
   UserCheck,
-  Users,
-  Target,
   PhoneCall
 } from "lucide-react"
 import { RecentCallsTable } from "./recent-calls-table"
@@ -175,7 +168,7 @@ export default function Dashboard() {
                 </p>
               </div>
             }>
-              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-3">
             <Card className="gradient-card purple overflow-hidden shadow-md">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Outbound Calls</CardTitle>
@@ -202,34 +195,6 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            <Card className="gradient-card green overflow-hidden shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-dashboard-green/10">
-                  <IndianRupee className="h-4 w-4 text-dashboard-green" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metrics.totalBalance}</div>
-                <p className="text-xs text-muted-foreground">
-                  Remaining from ₹5,000.00 initial balance
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="gradient-card pink overflow-hidden shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Average Call Cost</CardTitle>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-dashboard-pink/10">
-                  <BarChart3 className="h-4 w-4 text-dashboard-pink" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metrics.avgCallCost}</div>
-                <p className="text-xs text-muted-foreground">Sum of costs divided by total calls</p>
-              </CardContent>
-            </Card>
-
             <Card className="gradient-card orange overflow-hidden shadow-md">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Interested Leads</CardTitle>
@@ -240,19 +205,6 @@ export default function Dashboard() {
               <CardContent>
                 <div className="text-2xl font-bold">{Math.floor(metrics.totalCalls * 0.25)}</div>
                 <p className="text-xs text-muted-foreground">Clients showing interest in properties</p>
-              </CardContent>
-            </Card>
-
-            <Card className="gradient-card teal overflow-hidden shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Hot Prospects</CardTitle>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-dashboard-teal/10">
-                  <Target className="h-4 w-4 text-dashboard-teal" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{Math.floor(metrics.totalCalls * 0.15)}</div>
-                <p className="text-xs text-muted-foreground">High-quality leads ready to move forward</p>
               </CardContent>
             </Card>
           </div>
