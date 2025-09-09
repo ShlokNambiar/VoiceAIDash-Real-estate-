@@ -42,7 +42,7 @@ export async function saveCallData(call: CallData) {
   
   try {
     // Check if database is available
-    if (!process.env.POSTGRES_URL) {
+    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
       console.log(`⚠️ [${callId}] No database connection available, skipping save`);
       return { success: false, id: callId, error: 'No database connection' };
     }
@@ -179,7 +179,7 @@ interface DBCallRow {
 export async function getAllCalls(): Promise<CallData[]> {
   try {
     // Check if database is available
-    if (!process.env.POSTGRES_URL) {
+    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
       console.log('🔍 No database connection available, returning empty array');
       return [];
     }

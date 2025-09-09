@@ -5,7 +5,7 @@ import { CallData, saveCallData, getAllCalls } from '@/lib/webhook-service';
 let dbInitialized = false;
 
 async function ensureDbInitialized() {
-  if (!dbInitialized && process.env.POSTGRES_URL) {
+  if (!dbInitialized && (process.env.POSTGRES_URL || process.env.DATABASE_URL)) {
     try {
       const { initDB } = await import('@/lib/db');
       await initDB();

@@ -2,8 +2,8 @@ import { sql } from '@vercel/postgres';
 
 async function addSummaryColumnIfNotExists() {
   // Skip if no database connection available
-  if (!process.env.POSTGRES_URL) {
-    console.log('⚠️ No POSTGRES_URL found. Skipping summary column check.');
+  if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+    console.log('⚠️ No POSTGRES_URL or DATABASE_URL found. Skipping summary column check.');
     return;
   }
   
@@ -71,8 +71,8 @@ async function addSummaryColumnIfNotExists() {
 
 export async function initDB() {
   // Check if database connection is available before attempting initialization
-  if (!process.env.POSTGRES_URL) {
-    console.log('⚠️ No POSTGRES_URL environment variable found. Skipping database initialization.');
+  if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+    console.log('⚠️ No POSTGRES_URL or DATABASE_URL environment variable found. Skipping database initialization.');
     return;
   }
   
