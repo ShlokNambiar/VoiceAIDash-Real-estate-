@@ -1,6 +1,12 @@
 import { sql } from '@vercel/postgres';
 
 async function addSummaryColumnIfNotExists() {
+  // Skip if no database connection available
+  if (!process.env.POSTGRES_URL) {
+    console.log('⚠️ No POSTGRES_URL found. Skipping summary column check.');
+    return;
+  }
+  
   try {
     // Check if the summary column exists
     const columnExists = await sql`
@@ -64,6 +70,12 @@ async function addSummaryColumnIfNotExists() {
 }
 
 export async function initDB() {
+  // Check if database connection is available before attempting initialization
+  if (!process.env.POSTGRES_URL) {
+    console.log('⚠️ No POSTGRES_URL environment variable found. Skipping database initialization.');
+    return;
+  }
+  
   try {
     // Create the table if it doesn't exist
     await sql`

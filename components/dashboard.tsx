@@ -27,7 +27,10 @@ export default function Dashboard() {
     totalBalance: "₹5,000.00",
     avgCallCost: "₹0.00",
     successRate: "0%",
-    totalReservations: 0,
+    interestedLeads: 0,
+    appointmentsScheduled: 0,
+    callbacksRequested: 0,
+    hotLeads: 0,
     lastRefreshed: new Date().toLocaleTimeString(),
   })
   const [callData, setCallData] = useState<CallData[]>([])
@@ -251,14 +254,8 @@ export default function Dashboard() {
               </div>
             </TabsContent>
           </Tabs>
-            </div>
           </ErrorBoundary>
           )}
-        </main>
-      </div>
-    </div>
-  )
-}
         </main>
       </div>
     </div>

@@ -109,9 +109,40 @@ export async function POST(request: NextRequest) {
     for (const item of newData) {
       console.log(`📥 [${requestId}] Processing call data item:`, JSON.stringify(item, null, 2));
       
+      // Handle new Ultravox webhook format
+      let processedItem: any = {};
+      
+      // Check if this is the new Ultravox format with 'call' object
+      if (item.event === 'call.ended' && item.call) {
+        console.log(`🔄 [${requestId}] Detected new Ultravox format`);
+        const call = item.call;
+        
+        processedItem = {
+          id: call.callId || call.id,
+          callId: call.callId,
+          caller_name: 'Unknown Caller', // Will be extracted from transcript/summary
+          phone: '', // Not provided in this format
+          call_start: call.created,
+          call_end: call.ended,
+          duration: 0, // Will be calculated
+          transcript: call.transcript || '',
+          summary: call.summary || call.shortSummary || '',
+          success_flag: call.endReason !== 'unjoined' && call.endReason !== 'timeout',
+          cost: 0, // Will be calculated based on billedDuration
+          endReason: call.endReason,
+          billedDuration: call.billedDuration,
+          systemPrompt: call.systemPrompt
+        };
+        
+        console.log(`✅ [${requestId}] Transformed Ultravox format to:`, processedItem);
+      } else {
+        // Handle existing format
+        processedItem = item;
+      }
+      
       // Generate a unique call ID if not provided or if it's a duplicate
       const generateNewCallId = (): string => `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-      let callId = item.id || item.ID?.toString() || generateNewCallId();
+      let callId = processedItem.id || processedItem.callId || processedItem.ID?.toString() || generateNewCallId();
       
       // If this is a duplicate of an existing call but with different data, generate a new ID
       const isDuplicate = existingCalls.some((existingCall: CallData) => {
@@ -133,8 +164,8 @@ export async function POST(request: NextRequest) {
         let duration: number;
         
         try {
-          const startTime = item.call_start || item['Call Start'] || new Date().toISOString();
-          const endTime = item.call_end || item['Call End'] || new Date().toISOString();
+          const startTime = processedItem.call_start || processedItem['Call Start'] || processedItem.created || new Date().toISOString();
+          const endTime = processedItem.call_end || processedItem['Call End'] || processedItem.ended || new Date().toISOString();
           
           console.log(`⏱️ [${requestId}] Parsing timestamps:`, { startTime, endTime });
           
@@ -143,19 +174,29 @@ export async function POST(request: NextRequest) {
           
           if (isNaN(callStart.getTime()) || isNaN(callEnd.getTime())) {
             console.error(`❌ [${requestId}] Invalid date format for call ${callId}`, {
-              call_start: item.call_start,
-              call_end: item.call_end,
-              'Call Start': item['Call Start'],
-              'Call End': item['Call End']
+              call_start: processedItem.call_start,
+              call_end: processedItem.call_end,
+              created: processedItem.created,
+              ended: processedItem.ended
             });
             throw new Error('Invalid date format');
           }
           
           duration = Math.max(0, Math.floor((callEnd.getTime() - callStart.getTime()) / 1000));
+          
+          // Override duration if billedDuration is provided (from Ultravox)
+          if (processedItem.billedDuration) {
+            const billedMatch = processedItem.billedDuration.match(/(\d+)s/);
+            if (billedMatch) {
+              duration = parseInt(billedMatch[1]) || duration;
+            }
+          }
+          
           console.log(`⏱️ [${requestId}] Parsed timestamps:`, {
             callStart: callStart.toISOString(),
             callEnd: callEnd.toISOString(),
-            duration: `${duration}s`
+            duration: `${duration}s`,
+            billedDuration: processedItem.billedDuration
           });
           
         } catch (dateError) {
@@ -172,7 +213,7 @@ export async function POST(request: NextRequest) {
         // Parse cost with validation and detailed logging
         let cost: number;
         try {
-          const rawCost = item.cost ?? item.Cost;
+          const rawCost = processedItem.cost ?? processedItem.Cost;
           console.log(`💰 [${requestId}] Parsing cost for call ${callId}:`, { rawCost, type: typeof rawCost });
           
           cost = typeof rawCost === 'number' 
@@ -180,6 +221,11 @@ export async function POST(request: NextRequest) {
             : typeof rawCost === 'string' 
               ? parseFloat(rawCost) || 0 
               : 0;
+          
+          // Calculate cost based on duration if not provided (rough estimate: ₹0.50 per minute)
+          if (cost === 0 && duration > 0) {
+            cost = Math.round((duration / 60) * 0.50 * 100) / 100; // ₹0.50 per minute
+          }
           
           if (isNaN(cost) || !isFinite(cost)) {
             console.warn(`⚠️ [${requestId}] Invalid cost value for call ${callId}:`, rawCost);
@@ -194,27 +240,90 @@ export async function POST(request: NextRequest) {
         }
 
         // Transform the data to match our CallData interface with validation
-        const callerName = item.caller_name || item['Caller Name'] || 'Unknown Caller';
-        const phone = item.phone || '';
+        const callerName = processedItem.caller_name || processedItem['Caller Name'] || 'Unknown Caller';
+        const phone = processedItem.phone || '';
         
         // Map fields correctly - summary comes from Summary/summary field
-        const summary = item.summary || item.Summary || '';
+        const summary = processedItem.summary || processedItem.Summary || '';
         // Transcript should come from transcript field, or be empty if not provided
-        const transcript = item.transcript || '';
+        const transcript = processedItem.transcript || '';
+        
+        // Extract caller name from system prompt if available
+        let extractedCallerName = callerName;
+        if (processedItem.systemPrompt && callerName === 'Unknown Caller') {
+          // Try to extract property/project info from system prompt for better identification
+          const projectMatch = processedItem.systemPrompt.match(/regarding their new project.*?called\s+([^.]+)/i);
+          if (projectMatch) {
+            extractedCallerName = `Prospect - ${projectMatch[1].trim()}`;
+          } else {
+            extractedCallerName = 'Real Estate Prospect';
+          }
+        }
+        
+        // Determine client status and lead quality based on success and content
+        const determineClientStatus = (): CallData['client_status'] => {
+          // Check endReason for Ultravox format
+          if (processedItem.endReason) {
+            if (processedItem.endReason === 'unjoined' || processedItem.endReason === 'timeout') {
+              return 'no_answer';
+            }
+          }
+          
+          if (processedItem.success_flag === true) {
+            const content = (summary + transcript).toLowerCase();
+            if (content.includes('appointment') || content.includes('schedule') || content.includes('visit')) {
+              return 'appointment_scheduled';
+            } else if (content.includes('interested') || content.includes('like to know')) {
+              return 'interested';
+            } else if (content.includes('callback') || content.includes('call back')) {
+              return 'callback_requested';
+            }
+          }
+          return processedItem.success_flag === false ? 'not_interested' : 'unknown';
+        };
+        
+        const determineLeadQuality = (): CallData['lead_quality'] => {
+          const content = (summary + transcript + (processedItem.systemPrompt || '')).toLowerCase();
+          if (content.includes('very interested') || content.includes('definitely') || content.includes('ready to buy')) {
+            return 'hot';
+          } else if (content.includes('interested') || content.includes('maybe') || content.includes('thinking')) {
+            return 'warm';
+          } else if (content.includes('not interested') || content.includes('no thank') || processedItem.endReason === 'unjoined') {
+            return 'unqualified';
+          }
+          return 'cold';
+        };
+        
+        // Extract property interest from system prompt
+        let propertyInterest = processedItem.property_interest || '';
+        if (processedItem.systemPrompt && !propertyInterest) {
+          const projectMatches = processedItem.systemPrompt.match(/(Kalpataru Srishti|Prestige Mira Road|Prestige Group)/gi);
+          if (projectMatches) {
+            propertyInterest = projectMatches.join(', ');
+          }
+        }
         
         const callData: CallData = {
           id: callId,
-          caller_name: callerName.toString().substring(0, 255),
+          caller_name: extractedCallerName.toString().substring(0, 255),
           phone: phone.toString().substring(0, 50),
           call_start: callStart.toISOString(),
           call_end: callEnd.toISOString(),
           duration: duration,
           transcript: transcript.toString().substring(0, 10000),
           summary: summary.toString().substring(0, 10000),
-          success_flag: item.success_flag !== undefined 
-            ? Boolean(item.success_flag) 
-            : (item.Success !== undefined ? Boolean(item.Success) : false),
-          cost: cost
+          success_flag: processedItem.success_flag !== undefined 
+            ? Boolean(processedItem.success_flag) 
+            : (processedItem.Success !== undefined ? Boolean(processedItem.Success) : 
+               (processedItem.endReason && processedItem.endReason !== 'unjoined' && processedItem.endReason !== 'timeout')),
+          cost: cost,
+          // Real Estate specific fields
+          client_status: determineClientStatus(),
+          property_interest: propertyInterest,
+          lead_quality: determineLeadQuality(),
+          follow_up_date: processedItem.follow_up_date ? new Date(processedItem.follow_up_date).toISOString() : undefined,
+          agent_notes: processedItem.agent_notes || `AI Agent Call - End Reason: ${processedItem.endReason || 'Unknown'}`,
+          ultravox_call_id: processedItem.callId || callId
         };
         
         console.log(`📝 [${requestId}] Summary for call ${callId}:`, summary);

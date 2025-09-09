@@ -334,15 +334,38 @@ export async function calculateMetrics(data: CallData[]): Promise<DashboardMetri
   const currentBalance = INITIAL_BALANCE - totalCost
   const avgCallCostValue = totalCalls > 0 ? (totalCost / totalCalls) : 0
   
+  // Calculate real estate specific metrics
+  const interestedLeads = data.filter(call => 
+    call.success_flag && (
+      call.transcript?.toLowerCase().includes('interested') ||
+      call.summary?.toLowerCase().includes('interested')
+    )
+  ).length;
+  
+  const appointmentsScheduled = data.filter(call => 
+    call.transcript?.toLowerCase().includes('appointment') ||
+    call.summary?.toLowerCase().includes('schedule')
+  ).length;
+  
+  const callbacksRequested = data.filter(call => 
+    call.transcript?.toLowerCase().includes('callback') ||
+    call.summary?.toLowerCase().includes('call back')
+  ).length;
+  
+  const hotLeads = data.filter(call => 
+    call.lead_quality === 'hot'
+  ).length;
+
   return {
     totalCalls,
     avgCallDuration,
     totalBalance: formatINR(currentBalance),
     avgCallCost: formatINR(avgCallCostValue),
     successRate: totalCalls > 0 ? `${Math.round((successfulCalls / totalCalls) * 100)}%` : '0%',
-    totalReservations: data.filter(call => 
-      call.transcript?.toLowerCase().includes('reservation')
-    ).length,
+    interestedLeads,
+    appointmentsScheduled,
+    callbacksRequested,
+    hotLeads,
     lastRefreshed: new Date().toLocaleTimeString()
   }
 }

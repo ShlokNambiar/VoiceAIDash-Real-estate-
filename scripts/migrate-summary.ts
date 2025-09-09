@@ -68,4 +68,4 @@ async function migrateSummaryField() {
 }
 
 // Run the migration
-migrateSummary();
+migrateSummaryField();
