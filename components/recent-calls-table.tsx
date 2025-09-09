@@ -75,8 +75,8 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
             <TableHead className="min-w-[100px]">Caller</TableHead>
             <TableHead className="min-w-[80px] hidden sm:table-cell">Duration</TableHead>
             <TableHead className="min-w-[100px]">Time</TableHead>
-            <TableHead className="min-w-[150px]">Summary</TableHead>
-            <TableHead className="min-w-[80px]">Status</TableHead>
+            <TableHead className="min-w-[120px]">Interest Level</TableHead>
+            <TableHead className="min-w-[200px]">Transcript</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -102,7 +102,6 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
               className="hover:bg-gradient-to-r hover:from-purple-25 hover:via-pink-25 hover:to-blue-25"
             >
               <TableCell className="font-medium">{call.caller_name}</TableCell>
-              <TableCell className="hidden sm:table-cell">{call.phone}</TableCell>
               <TableCell className="hidden sm:table-cell">{formatDuration(call.duration)}</TableCell>
               <TableCell className="text-sm">{formatDistanceToNow(call.timestamp, { addSuffix: true })}</TableCell>
               <TableCell>
@@ -145,9 +144,9 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
                           </span>
                         </div>
                         <div className="sm:col-span-2 mt-4">
-                          <strong>Full Transcript:</strong>
-                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm whitespace-pre-wrap max-h-60 overflow-y-auto">
-                            {call.summary}
+                          <strong>Full Call Transcript:</strong>
+                          <div className="mt-2 p-4 bg-gray-50 rounded-lg text-sm whitespace-pre-wrap max-h-80 overflow-y-auto border">
+                            {call.summary || 'No transcript available'}
                           </div>
                         </div>
                       </div>
