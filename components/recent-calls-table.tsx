@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { formatDistanceToNow } from "date-fns"
 import { PhoneCall } from "lucide-react"
-import { type CallData } from "@/lib/webhook-service"
+import type { CallData } from "@/lib/types"
 
 // Helper function to format duration (handles both string and number types)
 function formatDuration(duration: string | number): string {

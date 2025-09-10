@@ -2,7 +2,8 @@
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { PieChart as PieChartIcon } from "lucide-react"
-import { getCallDurationData, type CallData } from "@/lib/webhook-service"
+import { getCallDurationData } from "@/lib/chart-utils"
+import type { CallData } from "@/lib/types"
 
 interface CallDurationChartProps {
   callData: CallData[]

@@ -2,7 +2,8 @@
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { BarChart3 } from "lucide-react"
-import { getCallsPerDayData, type CallData } from "@/lib/webhook-service"
+import { getCallsPerDayData } from "@/lib/chart-utils"
+import type { CallData } from "@/lib/types"
 
 interface CallsPerDayChartProps {
   callData: CallData[]
