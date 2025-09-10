@@ -3,9 +3,10 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Real Estate Call Dashboard - AI Analytics',
+  description: 'Advanced real estate call analytics powered by Ultravox AI. Track outbound calls, lead quality, and property interest with comprehensive insights.',
+  keywords: ['real estate', 'call analytics', 'AI', 'Ultravox', 'lead management', 'dashboard'],
+  authors: [{ name: 'Real Estate Analytics Team' }],
 }
 
 export default function RootLayout({

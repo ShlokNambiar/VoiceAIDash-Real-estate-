@@ -1,6 +1,7 @@
 "use client"
 
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { BarChart3 } from "lucide-react"
 import { getCallsPerDayData, type CallData } from "@/lib/webhook-service"
 
 interface CallsPerDayChartProps {
@@ -10,14 +11,29 @@ interface CallsPerDayChartProps {
 export function CallsPerDayChart({ callData }: CallsPerDayChartProps) {
   // Only use real webhook data
   const data = getCallsPerDayData(callData)
+  
+  if (callData.length === 0) {
+    return (
+      <div className="h-[300px] w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
+            <BarChart3 className="w-8 h-8 text-blue-400" />
+          </div>
+          <p className="text-gray-500 text-sm">No call data available</p>
+          <p className="text-gray-400 text-xs mt-1">Chart will appear once calls are made</p>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
           <defs>
             <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#EC4899" stopOpacity={0.2} />
+              <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#06B6D4" stopOpacity={0.2} />
             </linearGradient>
           </defs>
           <XAxis
@@ -40,16 +56,16 @@ export function CallsPerDayChart({ callData }: CallsPerDayChartProps) {
               border: "1px solid #E5E7EB",
             }}
             labelStyle={{ fontWeight: "bold", color: "#4B5563" }}
-            itemStyle={{ color: "#8B5CF6" }}
+            itemStyle={{ color: "#3B82F6" }}
           />
           <Area
             type="monotone"
             dataKey="calls"
-            stroke="#8B5CF6"
+            stroke="#3B82F6"
             strokeWidth={3}
             fillOpacity={1}
             fill="url(#colorCalls)"
-            activeDot={{ r: 6, fill: "#EC4899", stroke: "white", strokeWidth: 2 }}
+            activeDot={{ r: 6, fill: "#06B6D4", stroke: "white", strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>

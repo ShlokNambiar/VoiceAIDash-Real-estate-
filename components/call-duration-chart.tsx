@@ -1,6 +1,7 @@
 "use client"
 
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
+import { PieChart as PieChartIcon } from "lucide-react"
 import { getCallDurationData, type CallData } from "@/lib/webhook-service"
 
 interface CallDurationChartProps {
@@ -51,9 +52,22 @@ const renderCustomizedLabel = ({
 
 export function CallDurationChart({ callData = [] }: CallDurationChartProps) {
   // Use webhook data and ensure we have valid data
-  const data = callData.length > 0 ? getCallDurationData(callData) : [
-    { name: "No Data", value: 1, color: "#E5E7EB" }
-  ]
+  const data = getCallDurationData(callData)
+  
+  if (callData.length === 0) {
+    return (
+      <div className="h-[300px] w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+            <PieChartIcon className="w-8 h-8 text-purple-400" />
+          </div>
+          <p className="text-gray-500 text-sm">No call data available</p>
+          <p className="text-gray-400 text-xs mt-1">Duration chart will appear once calls are made</p>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -75,7 +89,7 @@ export function CallDurationChart({ callData = [] }: CallDurationChartProps) {
               <Cell
                 key={`cell-${index}`}
                 fill={entry.color}
-                style={{ filter: "drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1))" }}
+                style={{ filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1))" }}
               />
             ))}
           </Pie>
@@ -89,7 +103,7 @@ export function CallDurationChart({ callData = [] }: CallDurationChartProps) {
                         <div className="h-4 w-4 rounded-full" style={{ backgroundColor: payload[0].payload.color }} />
                         <span className="text-sm font-medium">{payload[0].name}</span>
                       </div>
-                      <div className="text-right text-sm font-medium">{payload[0].value}%</div>
+                      <div className="text-right text-sm font-medium">{payload[0].value} calls</div>
                     </div>
                   </div>
                 )
