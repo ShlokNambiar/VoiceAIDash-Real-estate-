@@ -20,6 +20,21 @@ export interface CallData {
   ultravox_call_id?: string // Original Ultravox call ID
 }
 
+export interface Lead {
+  id: string
+  name: string
+  email?: string
+  phone?: string
+  property_interest?: string
+  budget?: number
+  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost'
+  source?: string
+  created_at: Date | string
+  updated_at?: Date | string
+  notes?: string
+  assigned_agent?: string
+}
+
 export interface DashboardMetrics {
   totalCalls: number
   avgCallDuration: string
@@ -225,6 +240,53 @@ export async function getAllCalls(): Promise<CallData[]> {
     });
   } catch (error) {
     console.error('❌ Error fetching calls:', error);
+    throw error; // Re-throw to be handled by the route
+  }
+}
+
+// Get all leads from the database
+export async function getAllLeads(): Promise<Lead[]> {
+  try {
+    // Check if database is available
+    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+      console.log('🔍 No database connection available, returning empty leads array');
+      return [];
+    }
+    
+    console.log('🔍 Fetching all leads from database...');
+    const result = await sql`
+      SELECT * FROM leads 
+      ORDER BY created_at DESC
+    `;
+    
+    console.log(`✅ Successfully retrieved ${result.rows.length} leads`);
+    
+    return result.rows.map((row: any) => {
+      const lead: Lead = {
+        id: row.id,
+        name: row.name || 'Unknown Lead',
+        email: row.email || '',
+        phone: row.phone || '',
+        property_interest: row.property_interest || '',
+        budget: row.budget ? Number(row.budget) : undefined,
+        status: row.status || 'new',
+        source: row.source || '',
+        created_at: new Date(row.created_at),
+        updated_at: row.updated_at ? new Date(row.updated_at) : undefined,
+        notes: row.notes || '',
+        assigned_agent: row.assigned_agent || ''
+      };
+      
+      console.log(`📝 Processed lead ${lead.id}:`, {
+        name: lead.name,
+        status: lead.status,
+        created: lead.created_at
+      });
+      
+      return lead;
+    });
+  } catch (error) {
+    console.error('❌ Error fetching leads:', error);
     throw error; // Re-throw to be handled by the route
   }
 }

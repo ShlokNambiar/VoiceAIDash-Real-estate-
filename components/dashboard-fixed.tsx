@@ -12,14 +12,16 @@ import {
   AlertCircle,
   UserCheck,
   PhoneCall,
-  Search
+  Search,
+  Users
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { LeadsTable } from "./leads-table"
 import { RecentCallsTable } from "./recent-calls-table"
 import { CallsPerDayChart } from "./calls-per-day-chart"
 import { CallDurationChart } from "./call-duration-chart"
 import { ErrorBoundary } from "./error-boundary"
-import { fetchWebhookData, calculateMetrics, type CallData, type DashboardMetrics } from "@/lib/webhook-service"
+import { fetchWebhookData, calculateMetrics, getAllLeads, type CallData, type DashboardMetrics, type Lead } from "@/lib/webhook-service"
 
 export default function Dashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
@@ -35,6 +37,7 @@ export default function Dashboard() {
     lastRefreshed: new Date().toLocaleTimeString(),
   })
   const [callData, setCallData] = useState<CallData[]>([])
+  const [leadsData, setLeadsData] = useState<Lead[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,20 +48,26 @@ export default function Dashboard() {
     setError(null)
 
     try {
-      const response = await fetch('/api/webhook')
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Failed to fetch data: ${response.status} ${response.statusText} - ${errorText}`)
+      // Fetch both calls and leads in parallel
+      const [callsResponse, leadsResponse] = await Promise.all([
+        fetch('/api/webhook'),
+        fetch('/api/leads')
+      ])
+      
+      // Handle calls data
+      if (!callsResponse.ok) {
+        const errorText = await callsResponse.text()
+        throw new Error(`Failed to fetch calls: ${callsResponse.status} ${callsResponse.statusText} - ${errorText}`)
       }
 
-      const data = await response.json()
-      console.log('API Response:', data) // Debug log
+      const callsData = await callsResponse.json()
+      console.log('Calls API Response:', callsData) // Debug log
 
-      if (!data.success || !Array.isArray(data.data)) {
-        throw new Error('Invalid data format received from API')
+      if (!callsData.success || !Array.isArray(callsData.data)) {
+        throw new Error('Invalid calls data format received from API')
       }
 
-      const processedCalls = data.data.map((call: any) => ({
+      const processedCalls = callsData.data.map((call: any) => ({
         ...call,
         call_start: new Date(call.call_start),
         call_end: call.call_end ? new Date(call.call_end) : null,
@@ -66,12 +75,20 @@ export default function Dashboard() {
         cost: call.cost ?? 0,
       }))
 
+      // Handle leads data
+      const leadsData = await leadsResponse.json()
+      console.log('Leads API Response:', leadsData) // Debug log
+      
+      const processedLeads = Array.isArray(leadsData.data) ? leadsData.data : []
+
       console.log('Processed calls data:', processedCalls) // Debug log
+      console.log('Processed leads data:', processedLeads) // Debug log
 
       const calculatedMetrics = await calculateMetrics(processedCalls)
       console.log('Calculated metrics:', calculatedMetrics) // Debug log
 
       setCallData(processedCalls)
+      setLeadsData(processedLeads)
       setMetrics(calculatedMetrics)
     } catch (err) {
       setError('Failed to fetch data. Please try again.')
@@ -175,8 +192,9 @@ export default function Dashboard() {
               </div>
 
               <Tabs defaultValue="recent-calls" className="w-full mt-6">
-                <TabsList className="grid w-full max-w-md grid-cols-2 bg-gradient-to-r from-purple-50 to-blue-50">
+                <TabsList className="grid w-full max-w-lg grid-cols-3 bg-gradient-to-r from-purple-50 to-blue-50">
                   <TabsTrigger value="recent-calls" className="text-sm">Recent Calls</TabsTrigger>
+                  <TabsTrigger value="leads" className="text-sm">Leads</TabsTrigger>
                   <TabsTrigger value="analytics" className="text-sm">Analytics</TabsTrigger>
                 </TabsList>
                 
@@ -187,6 +205,20 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <RecentCallsTable callData={callData} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="leads" className="border-none p-0 pt-6">
+                  <Card className="shadow-md">
+                    <CardHeader className="bg-gradient-to-r from-green-100 via-emerald-50 to-teal-100 flex flex-row items-center justify-between">
+                      <CardTitle>All Leads</CardTitle>
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
+                        <Users className="h-4 w-4 text-green-500" />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <LeadsTable leadsData={leadsData} />
                     </CardContent>
                   </Card>
                 </TabsContent>
