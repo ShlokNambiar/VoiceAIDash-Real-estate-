@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { supabase } from './supabase';
 
 export interface CallData {
   id: string
@@ -46,11 +46,6 @@ export async function saveCallData(call: CallData) {
   const callId = call.id || 'unknown';
   
   try {
-    // Check if database is available
-    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
-      console.log(`⚠️ [${callId}] No database connection available, skipping save`);
-      return { success: false, id: callId, error: 'No database connection' };
-    }
     
     console.log(`💽 [${new Date().toISOString()}] Starting database save for call:`, {
       id: callId,
@@ -62,17 +57,24 @@ export async function saveCallData(call: CallData) {
 
     // First check if a record with this ID already exists
     console.log(`🔍 [${callId}] Checking for existing record...`);
-    const existingRecord = await sql`
-      SELECT id, call_start, caller_name FROM calls WHERE id = ${callId} LIMIT 1;
-    `;
+    const { data: existingRecord, error: checkError } = await supabase
+      .from('calls')
+      .select('id, call_start, caller_name')
+      .eq('id', callId)
+      .limit(1);
+    
+    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" which is OK
+      console.error(`❌ [${callId}] Error checking for existing record:`, checkError);
+      throw checkError;
+    }
     
     console.log(`🔍 [${callId}] Existing record check:`, {
-      exists: existingRecord.rows.length > 0,
-      existingData: existingRecord.rows[0] || null
+      exists: existingRecord && existingRecord.length > 0,
+      existingData: existingRecord && existingRecord[0] || null
     });
 
     // Only insert if the record doesn't exist
-    if (!existingRecord.rows.length) {
+    if (!existingRecord || existingRecord.length === 0) {
       console.log(`📝 [${callId}] No existing record found, preparing to insert...`);
       
       const insertData = {
@@ -97,33 +99,17 @@ export async function saveCallData(call: CallData) {
       
       console.log(`📥 [${callId}] Inserting call data:`, JSON.stringify(insertData, null, 2));
       
-      const result = await sql`
-        INSERT INTO calls (
-          id, caller_name, phone, call_start, call_end, 
-          duration, transcript, summary, success_flag, cost,
-          client_status, property_interest, lead_quality, follow_up_date, agent_notes, ultravox_call_id
-        ) VALUES (
-          ${insertData.id},
-          ${insertData.caller_name},
-          ${insertData.phone},
-          ${insertData.call_start},
-          ${insertData.call_end},
-          ${insertData.duration},
-          ${insertData.transcript},
-          ${insertData.summary},
-          ${insertData.success_flag},
-          ${insertData.cost},
-          ${insertData.client_status},
-          ${insertData.property_interest},
-          ${insertData.lead_quality},
-          ${insertData.follow_up_date},
-          ${insertData.agent_notes},
-          ${insertData.ultravox_call_id}
-        )
-        RETURNING id, call_start, caller_name
-      `;
+      const { data: result, error: insertError } = await supabase
+        .from('calls')
+        .insert([insertData])
+        .select('id, call_start, caller_name');
       
-      const insertedRecord = result.rows[0];
+      if (insertError) {
+        console.error(`❌ [${callId}] Error inserting call data:`, insertError);
+        throw insertError;
+      }
+      
+      const insertedRecord = result && result[0];
       console.log(`✅ [${callId}] Successfully created record:`, {
         id: insertedRecord.id,
         caller: insertedRecord.caller_name,
@@ -133,7 +119,7 @@ export async function saveCallData(call: CallData) {
       
       return { success: true, id: insertedRecord.id };
     } else {
-      const existing = existingRecord.rows[0];
+      const existing = existingRecord[0];
       console.log(`ℹ️ [${callId}] Record already exists, skipping insert. Details:`, {
         existingCaller: existing.caller_name,
         existingTimestamp: existing.call_start,
@@ -183,21 +169,22 @@ interface DBCallRow {
 // Get all calls from the database
 export async function getAllCalls(): Promise<CallData[]> {
   try {
-    // Check if database is available
-    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
-      console.log('🔍 No database connection available, returning empty array');
-      return [];
+    console.log('🔍 Fetching all calls from Supabase...');
+    
+    // Use Supabase client to fetch calls
+    const { data, error } = await supabase
+      .from('calls')
+      .select('*')
+      .order('call_start', { ascending: false });
+    
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      throw error;
     }
     
-    console.log('🔍 Fetching all calls from database...');
-    const result = await sql`
-      SELECT * FROM calls 
-      ORDER BY call_start DESC
-    `;
+    console.log(`✅ Successfully retrieved ${data?.length || 0} calls`);
     
-    console.log(`✅ Successfully retrieved ${result.rows.length} calls`);
-    
-    return result.rows.map((row: any) => {
+    return (data || []).map((row: any) => {
       // Ensure all required fields are present and properly formatted
       const callData: CallData = {
         id: row.id,
@@ -230,32 +217,31 @@ export async function getAllCalls(): Promise<CallData[]> {
     });
   } catch (error) {
     console.error('❌ Error fetching calls:', error);
-    throw error; // Re-throw to be handled by the route
+    // Return empty array instead of throwing to prevent dashboard from breaking
+    return [];
   }
 }
 
 // Get all leads from the database
 export async function getAllLeads(): Promise<Lead[]> {
   try {
-    // Check if database is available
-    if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
-      console.log('🔍 No database connection available, returning empty leads array');
-      return [];
+    console.log('🔍 Fetching all leads from Supabase...');
+    
+    // Use Supabase client to fetch leads
+    const { data, error } = await supabase
+      .from('Leads')
+      .select('"Owner Name", "Mobile No"')
+      .order('Owner Name', { ascending: true });
+    
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      throw error;
     }
     
-    console.log('🔍 Fetching all leads from database...');
-    console.log('🔗 Database URL exists:', !!(process.env.POSTGRES_URL || process.env.DATABASE_URL));
+    console.log(`✅ Successfully retrieved ${data?.length || 0} leads`);
+    console.log('🔍 First few rows:', data?.slice(0, 3));
     
-    // Use @vercel/postgres with better error handling
-    const result = await sql`
-      SELECT "Owner Name", "Mobile No" FROM public."Leads" 
-      ORDER BY "Owner Name" ASC
-    `;
-    
-    console.log(`✅ Successfully retrieved ${result.rows.length} leads`);
-    console.log('🔍 First few rows:', result.rows.slice(0, 3));
-    
-    return result.rows.map((row: any) => {
+    return (data || []).map((row: any) => {
       const lead: Lead = {
         "Owner Name": row["Owner Name"] || null,
         "Mobile No": row["Mobile No"] || null
