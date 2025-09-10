@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { Pool } from 'pg';
 
 export interface CallData {
   id: string
@@ -243,27 +244,68 @@ export async function getAllLeads(): Promise<Lead[]> {
       return [];
     }
     
-    console.log('🔍 Fetching all leads from database...');
-    const result = await sql`
-      SELECT "Owner Name", "Mobile No" FROM public."Leads" 
-      ORDER BY "Owner Name" ASC
-    `;
+    console.log('🔍 Fetching all leads from database using native pg client...');
     
-    console.log(`✅ Successfully retrieved ${result.rows.length} leads`);
+    // Try using native pg client for better Supabase compatibility
+    const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+    const pool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false }
+    });
     
-    return result.rows.map((row: any) => {
-      const lead: Lead = {
-        "Owner Name": row["Owner Name"] || null,
-        "Mobile No": row["Mobile No"] || null
-      };
+    try {
+      const client = await pool.connect();
       
-      console.log(`📝 Processed lead:`, {
-        name: lead["Owner Name"],
-        mobile: lead["Mobile No"]
+      // Query with exact column names from your Supabase table
+      const result = await client.query(
+        'SELECT "Owner Name", "Mobile No" FROM public."Leads" ORDER BY "Owner Name" ASC'
+      );
+      
+      client.release();
+      await pool.end();
+      
+      console.log(`✅ Successfully retrieved ${result.rows.length} leads using pg client`);
+      
+      return result.rows.map((row: any) => {
+        const lead: Lead = {
+          "Owner Name": row["Owner Name"] || null,
+          "Mobile No": row["Mobile No"] || null
+        };
+        
+        console.log(`📝 Processed lead:`, {
+          name: lead["Owner Name"],
+          mobile: lead["Mobile No"]
+        });
+        
+        return lead;
       });
       
-      return lead;
-    });
+    } catch (pgError) {
+      console.log('⚠️ pg client failed, trying @vercel/postgres...');
+      
+      // Fallback to @vercel/postgres
+      const result = await sql`
+        SELECT "Owner Name", "Mobile No" FROM public."Leads" 
+        ORDER BY "Owner Name" ASC
+      `;
+      
+      console.log(`✅ Successfully retrieved ${result.rows.length} leads using @vercel/postgres`);
+      
+      return result.rows.map((row: any) => {
+        const lead: Lead = {
+          "Owner Name": row["Owner Name"] || null,
+          "Mobile No": row["Mobile No"] || null
+        };
+        
+        console.log(`📝 Processed lead:`, {
+          name: lead["Owner Name"],
+          mobile: lead["Mobile No"]
+        });
+        
+        return lead;
+      });
+    }
+    
   } catch (error) {
     console.error('❌ Error fetching leads:', error);
     throw error; // Re-throw to be handled by the route
