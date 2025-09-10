@@ -27,7 +27,8 @@ import { RecentCallsTable } from "./recent-calls-table"
 import { CallsPerDayChart } from "./calls-per-day-chart"
 import { CallDurationChart } from "./call-duration-chart"
 import { ErrorBoundary } from "./error-boundary"
-import { fetchWebhookData, calculateMetrics, getAllLeads, type CallData, type DashboardMetrics, type Lead } from "@/lib/webhook-service"
+import { fetchWebhookData, calculateMetrics } from "@/lib/webhook-service"
+import type { CallData, DashboardMetrics, Lead } from "@/lib/types"
 
 export default function Dashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics>({

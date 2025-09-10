@@ -20,7 +20,7 @@ import {
   Filter,
   ArrowUpDown
 } from "lucide-react"
-import { Lead } from "@/lib/webhook-service"
+import type { Lead } from "@/lib/types"
 
 interface LeadsTableProps {
   leadsData: Lead[]

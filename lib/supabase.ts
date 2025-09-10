@@ -1,12 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase configuration
-const supabaseUrl = process.env.SUPA_SUPABASE_URL || process.env.SUPA_NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseKey = process.env.SUPA_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPA_NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Supabase configuration for server-side usage
+const supabaseUrl = process.env.SUPA_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.SUPA_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase environment variables')
-  console.error('Required: SUPA_SUPABASE_URL and SUPA_SUPABASE_SERVICE_ROLE_KEY')
+  console.error('Available env vars:', Object.keys(process.env).filter(key => key.includes('SUPABASE')))
+  console.error('Required: SUPA_SUPABASE_URL and SUPA_SUPABASE_SERVICE_ROLE_KEY for server-side')
+  console.error('Or: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY for client-side')
 }
 
 // Create a single supabase client for interacting with your database
