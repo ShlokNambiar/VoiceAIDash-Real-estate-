@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { 
   Table, 
   TableBody, 
@@ -10,49 +9,21 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Lead } from "@/lib/webhook-service"
-import { formatDistanceToNow } from "date-fns"
 
 interface LeadsTableProps {
   leadsData: Lead[]
 }
 
 export function LeadsTable({ leadsData }: LeadsTableProps) {
-  const getStatusColor = (status: Lead['status']) => {
-    switch (status) {
-      case 'new':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      case 'contacted':
-        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-      case 'qualified':
-        return 'bg-purple-100 text-purple-800 hover:bg-purple-200'
-      case 'converted':
-        return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case 'lost':
-        return 'bg-red-100 text-red-800 hover:bg-red-200'
-      default:
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-    }
-  }
-
-  const formatBudget = (budget?: number) => {
-    if (!budget) return 'Not specified'
+  const formatMobileNumber = (mobile: number | null) => {
+    if (!mobile) return 'Not provided'
     
-    if (budget >= 10000000) { // 1 crore
-      return `₹${(budget / 10000000).toFixed(1)} Cr`
-    } else if (budget >= 100000) { // 1 lakh
-      return `₹${(budget / 100000).toFixed(1)} L`
-    } else {
-      return `₹${budget.toLocaleString('en-IN')}`
+    const mobileStr = mobile.toString()
+    // Format Indian mobile numbers
+    if (mobileStr.length === 10) {
+      return `+91-${mobileStr.slice(0, 5)}-${mobileStr.slice(5)}`
     }
-  }
-
-  const formatDate = (date: Date | string) => {
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date
-      return formatDistanceToNow(dateObj, { addSuffix: true })
-    } catch (error) {
-      return 'Unknown'
-    }
+    return mobileStr
   }
 
   if (leadsData.length === 0) {
@@ -76,20 +47,15 @@ export function LeadsTable({ leadsData }: LeadsTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-purple-50 via-pink-25 to-blue-50">
-            <TableHead className="font-semibold">Name</TableHead>
-            <TableHead className="font-semibold">Contact</TableHead>
-            <TableHead className="font-semibold">Property Interest</TableHead>
-            <TableHead className="font-semibold">Budget</TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold">Source</TableHead>
-            <TableHead className="font-semibold">Agent</TableHead>
-            <TableHead className="font-semibold">Created</TableHead>
+            <TableHead className="font-semibold">Owner Name</TableHead>
+            <TableHead className="font-semibold">Mobile Number</TableHead>
+            <TableHead className="font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {leadsData.map((lead, index) => (
             <TableRow 
-              key={lead.id}
+              key={index}
               className={`
                 hover:bg-gradient-to-r hover:from-purple-25 hover:to-blue-25 transition-all duration-200
                 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}
@@ -97,78 +63,39 @@ export function LeadsTable({ leadsData }: LeadsTableProps) {
             >
               <TableCell className="font-medium">
                 <div className="flex flex-col">
-                  <span className="font-semibold text-gray-900">{lead.name}</span>
-                  {lead.notes && (
-                    <span className="text-xs text-gray-500 mt-1 line-clamp-2" title={lead.notes}>
-                      {lead.notes.length > 50 ? `${lead.notes.substring(0, 50)}...` : lead.notes}
-                    </span>
-                  )}
+                  <span className="font-semibold text-gray-900">
+                    {lead["Owner Name"] || 'Unknown Owner'}
+                  </span>
                 </div>
               </TableCell>
               
               <TableCell>
                 <div className="flex flex-col space-y-1">
-                  {lead.phone && (
+                  {lead["Mobile No"] ? (
                     <a 
-                      href={`tel:${lead.phone}`}
+                      href={`tel:+91${lead["Mobile No"]}`}
                       className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                      title={`Call ${lead.phone}`}
+                      title={`Call ${formatMobileNumber(lead["Mobile No"])}`}
                     >
-                      {lead.phone}
+                      {formatMobileNumber(lead["Mobile No"])}
                     </a>
-                  )}
-                  {lead.email && (
-                    <a 
-                      href={`mailto:${lead.email}`}
-                      className="text-sm text-gray-600 hover:text-gray-800 hover:underline"
-                      title={`Email ${lead.email}`}
-                    >
-                      {lead.email.length > 20 ? `${lead.email.substring(0, 20)}...` : lead.email}
-                    </a>
-                  )}
-                  {!lead.phone && !lead.email && (
-                    <span className="text-sm text-gray-400">No contact info</span>
+                  ) : (
+                    <span className="text-sm text-gray-400">No mobile number</span>
                   )}
                 </div>
               </TableCell>
               
               <TableCell>
-                <span className="text-sm text-gray-900">
-                  {lead.property_interest || 'Not specified'}
-                </span>
-              </TableCell>
-              
-              <TableCell>
-                <span className="text-sm font-medium text-gray-900">
-                  {formatBudget(lead.budget)}
-                </span>
-              </TableCell>
-              
-              <TableCell>
-                <Badge 
-                  variant="secondary" 
-                  className={`${getStatusColor(lead.status)} border-0 font-medium`}
-                >
-                  {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
-                </Badge>
-              </TableCell>
-              
-              <TableCell>
-                <span className="text-sm text-gray-600">
-                  {lead.source || 'Unknown'}
-                </span>
-              </TableCell>
-              
-              <TableCell>
-                <span className="text-sm text-gray-600">
-                  {lead.assigned_agent || 'Unassigned'}
-                </span>
-              </TableCell>
-              
-              <TableCell>
-                <span className="text-sm text-gray-500" title={new Date(lead.created_at).toLocaleString()}>
-                  {formatDate(lead.created_at)}
-                </span>
+                <div className="flex space-x-2">
+                  {lead["Mobile No"] && (
+                    <button className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors">
+                      Call
+                    </button>
+                  )}
+                  <button className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded hover:bg-green-200 transition-colors">
+                    Edit
+                  </button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

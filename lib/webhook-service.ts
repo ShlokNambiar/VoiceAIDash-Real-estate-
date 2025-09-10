@@ -21,18 +21,8 @@ export interface CallData {
 }
 
 export interface Lead {
-  id: string
-  name: string
-  email?: string
-  phone?: string
-  property_interest?: string
-  budget?: number
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost'
-  source?: string
-  created_at: Date | string
-  updated_at?: Date | string
-  notes?: string
-  assigned_agent?: string
+  "Owner Name": string | null
+  "Mobile No": number | null
 }
 
 export interface DashboardMetrics {
@@ -255,32 +245,21 @@ export async function getAllLeads(): Promise<Lead[]> {
     
     console.log('🔍 Fetching all leads from database...');
     const result = await sql`
-      SELECT * FROM leads 
-      ORDER BY created_at DESC
+      SELECT "Owner Name", "Mobile No" FROM "Leads" 
+      ORDER BY "Owner Name" ASC
     `;
     
     console.log(`✅ Successfully retrieved ${result.rows.length} leads`);
     
     return result.rows.map((row: any) => {
       const lead: Lead = {
-        id: row.id,
-        name: row.name || 'Unknown Lead',
-        email: row.email || '',
-        phone: row.phone || '',
-        property_interest: row.property_interest || '',
-        budget: row.budget ? Number(row.budget) : undefined,
-        status: row.status || 'new',
-        source: row.source || '',
-        created_at: new Date(row.created_at),
-        updated_at: row.updated_at ? new Date(row.updated_at) : undefined,
-        notes: row.notes || '',
-        assigned_agent: row.assigned_agent || ''
+        "Owner Name": row["Owner Name"] || null,
+        "Mobile No": row["Mobile No"] || null
       };
       
-      console.log(`📝 Processed lead ${lead.id}:`, {
-        name: lead.name,
-        status: lead.status,
-        created: lead.created_at
+      console.log(`📝 Processed lead:`, {
+        name: lead["Owner Name"],
+        mobile: lead["Mobile No"]
       });
       
       return lead;
