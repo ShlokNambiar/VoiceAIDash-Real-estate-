@@ -245,7 +245,7 @@ export async function getAllLeads(): Promise<Lead[]> {
     
     console.log('🔍 Fetching all leads from database...');
     const result = await sql`
-      SELECT "Owner Name", "Mobile No" FROM "Leads" 
+      SELECT "Owner Name", "Mobile No" FROM public."Leads" 
       ORDER BY "Owner Name" ASC
     `;
     
