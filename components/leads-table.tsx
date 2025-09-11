@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { 
   Users, 
   Search, 
@@ -31,7 +32,21 @@ export function LeadsTable({ leadsData }: LeadsTableProps) {
   const [sortField, setSortField] = useState<'name' | 'mobile'>('name')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [currentPage, setCurrentPage] = useState(1)
+  const [leadStatuses, setLeadStatuses] = useState<Record<number, string>>({})
   const itemsPerPage = 50
+
+  const statusOptions = [
+    { value: "-", label: "-", color: "text-gray-400" },
+    { value: "called", label: "Called", color: "bg-green-100 text-green-800 border-green-300" },
+    { value: "no_answer", label: "No Answer", color: "bg-gray-100 text-gray-800 border-gray-300" }
+  ]
+
+  const handleStatusChange = (leadIndex: number, newStatus: string) => {
+    setLeadStatuses(prev => ({
+      ...prev,
+      [leadIndex]: newStatus
+    }))
+  }
 
   // Filter and sort leads
   const filteredAndSortedLeads = useMemo(() => {
@@ -176,7 +191,7 @@ export function LeadsTable({ leadsData }: LeadsTableProps) {
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </TableHead>
-              <TableHead className="font-semibold text-gray-700 py-4">Actions</TableHead>
+              <TableHead className="font-semibold text-gray-700 py-4">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -219,26 +234,24 @@ export function LeadsTable({ leadsData }: LeadsTableProps) {
               </TableCell>
               
               <TableCell className="py-4">
-                <div className="flex space-x-2">
-                  {lead["Mobile No"] && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 px-3 py-1"
+                {(() => {
+                  const currentStatus = leadStatuses[index] || "-"
+                  const statusOption = statusOptions.find(opt => opt.value === currentStatus)
+                  
+                  return (
+                    <select
+                      value={currentStatus}
+                      onChange={(e) => handleStatusChange(index, e.target.value)}
+                      className="px-2 py-1 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     >
-                      <Phone className="h-3 w-3 mr-1" />
-                      Call
-                    </Button>
-                  )}
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="text-xs bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 px-3 py-1"
-                  >
-                    <Edit3 className="h-3 w-3 mr-1" />
-                    Edit
-                  </Button>
-                </div>
+                      {statusOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                })()}
               </TableCell>
             </TableRow>
           ))}

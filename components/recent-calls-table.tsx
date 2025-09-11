@@ -170,7 +170,6 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
                           <div className="bg-gray-50 p-4 rounded-xl">
                             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Call Metrics</div>
                             <div className="font-medium text-gray-900">{formatDuration(call.duration)}</div>
-                            <div className="text-sm text-gray-600">₹{typeof call.cost === 'number' ? call.cost.toFixed(2) : call.cost}</div>
                           </div>
                           <div className="bg-gray-50 p-4 rounded-xl">
                             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Status</div>
