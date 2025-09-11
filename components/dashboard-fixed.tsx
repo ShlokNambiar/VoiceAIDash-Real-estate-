@@ -136,7 +136,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Real Estate Call Dashboard
+                Vocacity Dashboard
               </h1>
               <p className="text-sm text-gray-500 mt-1">AI-powered outbound call analytics</p>
             </div>

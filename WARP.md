@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-This is a **Real Estate Call Dashboard** built with Next.js 15 that tracks outbound AI calls made by Ultravox AI for real estate leads. The dashboard visualizes call analytics, manages lead data, and integrates with Vercel Postgres for data storage.
+This is a **Vocacity Dashboard** built with Next.js 15 that tracks outbound AI calls made by Ultravox AI for real estate leads. The dashboard visualizes call analytics, manages lead data, and integrates with Vercel Postgres for data storage.
 
 **Key Features:**
 - Real-time call analytics and KPI tracking

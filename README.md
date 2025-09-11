@@ -1,4 +1,4 @@
-# Real Estate Call Dashboard
+# Vocacity Dashboard
 
 A dynamic Next.js dashboard for tracking real estate outbound call analytics with Ultravox AI integration.
 

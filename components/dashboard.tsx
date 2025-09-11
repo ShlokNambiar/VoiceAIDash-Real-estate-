@@ -130,7 +130,7 @@ export default function Dashboard() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
               <Building2 className="h-5 w-5 text-primary" />
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold">Real Estate Call Dashboard</h1>
+            <h1 className="text-lg sm:text-xl font-semibold">Vocacity Dashboard</h1>
           </div>
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
             {error && (
