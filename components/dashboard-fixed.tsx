@@ -22,7 +22,6 @@ import {
   Zap
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { LeadsTable } from "./leads-table"
 import { RecentCallsTable } from "./recent-calls-table"
 import { PotentialLeadsTable } from "./potential-leads-table"
 import { CallsPerDayChart } from "./calls-per-day-chart"
@@ -282,20 +281,13 @@ export default function Dashboard() {
             {/* Enhanced Tabs Section */}
             <div className="mt-8">
               <Tabs defaultValue="recent-calls" className="w-full" onValueChange={setActiveTab}>
-                <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-4 bg-white/60 backdrop-blur-sm border-0 shadow-lg rounded-2xl p-2">
+                <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3 bg-white/60 backdrop-blur-sm border-0 shadow-lg rounded-2xl p-2">
                   <TabsTrigger 
                     value="recent-calls" 
                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-xl transition-all duration-200"
                   >
                     <PhoneCall className="h-4 w-4 mr-2" />
                     Recent Calls
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="leads" 
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg rounded-xl transition-all duration-200"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    Leads
                   </TabsTrigger>
                   <TabsTrigger 
                     value="potential-leads" 
@@ -339,29 +331,6 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent className="p-0">
                       <RecentCallsTable callData={filteredCallData} />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="leads" className="border-none p-0 pt-8">
-                  <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-xl overflow-hidden">
-                    <CardHeader className="bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-lime-500/10 border-b border-gray-100/50">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg">
-                          <Users className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg font-semibold text-gray-900">
-                            Lead Database
-                          </CardTitle>
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {leadsData.length} available leads
-                          </p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <LeadsTable leadsData={leadsData} />
                     </CardContent>
                   </Card>
                 </TabsContent>
