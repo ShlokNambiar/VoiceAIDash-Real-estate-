@@ -40,7 +40,7 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
       summary: summary,
       success: call.success_flag,
       client_status: call.client_status || 'unknown',
-      property_interest: call.property_interest || '',
+
       lead_quality: call.lead_quality || 'cold'
     };
   })
@@ -67,11 +67,8 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
         <TableHeader>
           <TableRow className="border-gray-100">
             <TableHead className="font-semibold text-gray-700 py-4">Caller</TableHead>
-            <TableHead className="font-semibold text-gray-700 py-4 hidden md:table-cell">Phone</TableHead>
             <TableHead className="font-semibold text-gray-700 py-4 hidden sm:table-cell">Duration</TableHead>
             <TableHead className="font-semibold text-gray-700 py-4">Time</TableHead>
-            <TableHead className="font-semibold text-gray-700 py-4">Status</TableHead>
-            <TableHead className="font-semibold text-gray-700 py-4 hidden lg:table-cell">Property</TableHead>
             <TableHead className="font-semibold text-gray-700 py-4">Conversation</TableHead>
           </TableRow>
         </TableHeader>
@@ -123,22 +120,11 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
                     </div>
                     <div>
                       <div className="font-medium text-gray-900">{call.caller_name}</div>
-                      <div className="text-xs text-gray-500 md:hidden">{call.phone}</div>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="hidden md:table-cell py-4 text-gray-600">{call.phone}</TableCell>
                 <TableCell className="hidden sm:table-cell py-4 text-gray-600 font-mono text-sm">{formatDuration(call.duration)}</TableCell>
                 <TableCell className="py-4 text-gray-600 text-sm">{formatDistanceToNow(call.timestamp, { addSuffix: true })}</TableCell>
-                <TableCell className="py-4">
-                  <span className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium border ${statusInfo.color}`}>
-                    <span>{statusInfo.icon}</span>
-                    {statusInfo.level}
-                  </span>
-                </TableCell>
-                <TableCell className="hidden lg:table-cell py-4 text-gray-600 text-sm">
-                  {call.property_interest || 'Not specified'}
-                </TableCell>
                 <TableCell className="py-4">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -179,13 +165,7 @@ export function RecentCallsTable({ callData }: RecentCallsTableProps) {
                             </span>
                           </div>
                         </div>
-                        
-                        {call.property_interest && (
-                          <div className="bg-blue-50 p-4 rounded-xl">
-                            <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">Property Interest</div>
-                            <div className="text-blue-800 font-medium">{call.property_interest}</div>
-                          </div>
-                        )}
+
                         
                         <div>
                           <div className="text-sm font-semibold text-gray-700 mb-3">Call Conversation</div>
