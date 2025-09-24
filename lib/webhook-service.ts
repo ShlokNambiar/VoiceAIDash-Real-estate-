@@ -10,7 +10,7 @@ export { getCallsPerDayData, getCallDurationData } from './chart-utils';
 // Re-export metrics utilities for backward compatibility
 export { calculateMetrics } from './metrics-utils';
 
-const INITIAL_BALANCE = 5000; // ₹5000 starting balance
+const INITIAL_BALANCE = 15000; // ₹15000 starting balance
 
 // Save call data to the database
 export async function saveCallData(call: CallData) {

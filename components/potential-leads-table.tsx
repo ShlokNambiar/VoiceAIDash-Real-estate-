@@ -1,11 +1,7 @@
 "use client"
-
-import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search, Users, Phone, Clock, CheckCircle } from "lucide-react"
+import { Users, Phone, Clock, CheckCircle, Search } from "lucide-react"
 
 interface PotentialLead {
   serialNo: number
@@ -57,30 +53,61 @@ const potentialLeadsData: PotentialLead[] = [
   { serialNo: 37, customerName: "VIJETA  GIRI", phoneNumber: "9892009696", callDate: "19-09-2025", followUpStatus: "PRICE NEGOTIATION", agentNotes: "Customer responded positively to apartment presentation. Ready to visit" },
   { serialNo: 38, customerName: "RAJ H JUMANI", phoneNumber: "8850374949", callDate: "17-09-2025", followUpStatus: "DOCUMENTATION PENDING", agentNotes: "Customer responded positively to apartment presentation. Genuine buyer" },
   { serialNo: 39, customerName: "Deepakrao Swaminath Bharti", phoneNumber: "9769929050", callDate: "20-09-2025", followUpStatus: "DOCUMENTATION PENDING", agentNotes: "Customer responded positively to apartment presentation. Serious inquiry" },
-  { serialNo: 40, customerName: "AMIT BAJRANGLAL TOSHNIWAL", phoneNumber: "9820288862", callDate: "17-09-2025", followUpStatus: "AWAITING DECISION", agentNotes: "Customer responded positively to apartment presentation. Ready to visit" }
+  { serialNo: 40, customerName: "AMIT BAJRANGLAL TOSHNIWAL", phoneNumber: "9820288862", callDate: "17-09-2025", followUpStatus: "AWAITING DECISION", agentNotes: "Customer responded positively to apartment presentation. Ready to visit" },
+  // New leads from interested_customers_20250923_230841.xlsx
+  { serialNo: 41, customerName: "SAMIR HARSHADRAI JOSHI", phoneNumber: "7666956644", callDate: "23/09/2025", followUpStatus: "REQUESTED BROCHURE", agentNotes: "Medium engagement: 14 messages. Follow-up needed." },
+  { serialNo: 42, customerName: "TUSHAR MAHESHWARI", phoneNumber: "8981766817", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 43, customerName: "DEVDHAR BHASKAR MHATRE", phoneNumber: "9967442066", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 44, customerName: "JOSEPH THOMAS THEKKEMURYIL", phoneNumber: "9223193637", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 45, customerName: "HEMIN MUKESH SHAH", phoneNumber: "9819881138", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 46, customerName: "MANOHAR J ZORE", phoneNumber: "9833109358", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 47, customerName: "SUCHITRA SANDEEP KOKATE", phoneNumber: "9819681595", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 48, customerName: "SATISH DHONDU APARADH", phoneNumber: "8898876507", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 49, customerName: "PRAKASH GAUTAM KHANDARE", phoneNumber: "8369886445", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 50, customerName: "DINAR KRISHNARAO MHATRE", phoneNumber: "9819261212", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 51, customerName: "SUNIL SUBAKHAR HEGDE", phoneNumber: "9819607295", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 52, customerName: "ARMINO AUGUSTINE DSOUZA", phoneNumber: "9773521407", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 53, customerName: "JOY ABRAHAM", phoneNumber: "9819223302", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 54, customerName: "JOMIN VARGHESE", phoneNumber: "9167484663", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 55, customerName: "SUBHASH JAIN", phoneNumber: "7021566941", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 56, customerName: "RAHUL SANGHVI", phoneNumber: "9769238543", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 57, customerName: "REMYA SUDHIR MORE", phoneNumber: "9619974363", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 58, customerName: "VASUNDHARA VILAS KENI", phoneNumber: "9224343653", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 59, customerName: "ANSHUMAN NATEKAR", phoneNumber: "9930918005", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 60, customerName: "BHOIR PRASHANT", phoneNumber: "9819417411", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 61, customerName: "SANDHYA SHRIPADRAO SANAP", phoneNumber: "9322688825", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 62, customerName: "RAJESH VISHRAM SALVI", phoneNumber: "9819262842", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 63, customerName: "DEVANG BHANUPRASAD PATEL", phoneNumber: "9819262842", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 64, customerName: "RAJESH GIRDHAR KOTIAN", phoneNumber: "9819416754", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 65, customerName: "CHANDRAKANT SHIVRAM RANE", phoneNumber: "9819334242", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 66, customerName: "BHATIA NITIN", phoneNumber: "8655776333", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 67, customerName: "KOMAL SHARMA", phoneNumber: "8433997883", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 68, customerName: "PRAKASH BHANUSHALI", phoneNumber: "9819398717", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 69, customerName: "ANJALI JAYANT GOKHALE", phoneNumber: "9869242312", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 70, customerName: "JEMIN SHAH", phoneNumber: "9920435428", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 71, customerName: "THE MAH JUD ACA IND MED CEN TRA", phoneNumber: "8828133353", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 72, customerName: "SHAFIQUE MUKHTAR SHAIKH", phoneNumber: "9820926722", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 73, customerName: "LEENA PINTO", phoneNumber: "9892903411", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 74, customerName: "DEBABRATA MADAN MANDAL", phoneNumber: "9820562795", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 75, customerName: "DIGESH POONAMCHAND SHAH", phoneNumber: "9324697333", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 76, customerName: "KSHAMA KAMLESH SHUKLA", phoneNumber: "9867366181", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 77, customerName: "SIKANDAR RAJ KISHORMAL SANGHAVI", phoneNumber: "9324304200", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 78, customerName: "RAKESH PRAVINCHANDRA SHAH", phoneNumber: "9892213966", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 79, customerName: "DEEP PANKAJ SHAH", phoneNumber: "9870622867", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 80, customerName: "HITHARTH SUBHASH BHATT", phoneNumber: "8879545659", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 81, customerName: "MITCHELLE PRUTHESH RUPANI", phoneNumber: "9619112252", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 82, customerName: "SUBHA MURALIDHARAN", phoneNumber: "7400109989", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 83, customerName: "SHAILESH VIJAY MAHAMUNKAR", phoneNumber: "9833906660", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 84, customerName: "ANMOL DINESH SHARMA", phoneNumber: "8691846464", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 85, customerName: "RUPA PRADEEP PANSARI", phoneNumber: "9820584204", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 86, customerName: "MANESH HARSHAD SHAH", phoneNumber: "9699670888", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 87, customerName: "BHAVIK NAVINCHAND SURANA", phoneNumber: "7678089019", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 88, customerName: "VIJAYALAXMI GANGADHAR MEHERWADE", phoneNumber: "9324622421", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
+  { serialNo: 89, customerName: "JAYSHREE BALKISHAN SOLANKI", phoneNumber: "8655320799", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  { serialNo: 90, customerName: "VINOD KUMAR NANALAL DANGI", phoneNumber: "9930673848", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." }
 ]
 
 export function PotentialLeadsTable() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<'all' | 'site_visit' | 'awaiting' | 'brochure' | 'documentation' | 'negotiation' | 'callback'>('all')
-
-  // Filter leads based on search and status
-  const filteredLeads = potentialLeadsData.filter(lead => {
-    const matchesSearch = lead.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         lead.phoneNumber.includes(searchQuery) ||
-                         lead.agentNotes.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'site_visit' && lead.followUpStatus === 'SITE VISIT SCHEDULED') ||
-                         (statusFilter === 'awaiting' && lead.followUpStatus === 'AWAITING DECISION') ||
-                         (statusFilter === 'brochure' && lead.followUpStatus === 'REQUESTED BROCHURE') ||
-                         (statusFilter === 'documentation' && lead.followUpStatus === 'DOCUMENTATION PENDING') ||
-                         (statusFilter === 'negotiation' && lead.followUpStatus === 'PRICE NEGOTIATION') ||
-                         (statusFilter === 'callback' && lead.followUpStatus === 'PENDING CALLBACK')
-
-    return matchesSearch && matchesStatus
-  })
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'SITE VISIT SCHEDULED':
@@ -136,47 +163,6 @@ export function PotentialLeadsTable() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-4 flex-1 max-w-md">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Search leads by name, phone, or notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 bg-white/50 border-gray-200/50 focus:bg-white/80 focus:border-emerald-200"
-            />
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="px-3 py-2 rounded-md border border-gray-200/50 bg-white/50 text-sm"
-          >
-            <option value="all">All Status</option>
-            <option value="site_visit">Site Visit Scheduled</option>
-            <option value="awaiting">Awaiting Decision</option>
-            <option value="brochure">Requested Brochure</option>
-            <option value="documentation">Documentation Pending</option>
-            <option value="negotiation">Price Negotiation</option>
-            <option value="callback">Pending Callback</option>
-          </select>
-        </div>
-      </div>
-
-
-
-      {/* Results Summary */}
-      {searchQuery && (
-        <div className="text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-          Found <strong>{filteredLeads.length}</strong> leads matching "{searchQuery}"
-        </div>
-      )}
-
       {/* Table */}
       <div className="bg-white/60 backdrop-blur-sm border-0 shadow-xl overflow-hidden rounded-2xl">
         <Table>
@@ -189,7 +175,7 @@ export function PotentialLeadsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLeads.map((lead) => (
+            {potentialLeadsData.map((lead) => (
               <TableRow 
                 key={lead.serialNo}
                 className="group hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-green-50/50 border-b border-gray-50 transition-all duration-200"
@@ -234,11 +220,7 @@ export function PotentialLeadsTable() {
         <div className="border-t border-gray-100 bg-gradient-to-r from-emerald-50/50 to-green-50/50 px-6 py-3">
           <div className="flex items-center justify-between text-sm">
             <div className="text-gray-600">
-              {searchQuery ? (
-                <>Found <strong>{filteredLeads.length}</strong> of <strong>{potentialLeadsData.length}</strong> total leads</>
-              ) : (
-                <>Total <strong>{potentialLeadsData.length}</strong> potential leads</>
-              )}
+              Total <strong>{potentialLeadsData.length}</strong> potential leads (including 50 new leads from 23/09/2025)
             </div>
             <div className="text-gray-500 text-xs">
               Updated {new Date().toLocaleTimeString()}

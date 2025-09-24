@@ -17,6 +17,7 @@ import {
 import { RecentCallsTable } from "./recent-calls-table"
 import { CallsPerDayChart } from "./calls-per-day-chart"
 import { CallDurationChart } from "./call-duration-chart"
+import { PotentialLeadsTable } from "./potential-leads-table"
 import { ErrorBoundary } from "./error-boundary"
 import { fetchWebhookData, calculateMetrics, type CallData, type DashboardMetrics } from "@/lib/webhook-service"
 
@@ -171,7 +172,7 @@ export default function Dashboard() {
                 </p>
               </div>
             }>
-              <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-4">
             <Card className="gradient-card purple overflow-hidden shadow-md">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Total Outbound Calls</CardTitle>
@@ -206,16 +207,30 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{Math.floor(metrics.totalCalls * 0.25)}</div>
+                <div className="text-2xl font-bold">{metrics.interestedLeads}</div>
                 <p className="text-xs text-muted-foreground">Clients showing interest in properties</p>
+              </CardContent>
+            </Card>
+
+            <Card className="gradient-card green overflow-hidden shadow-md">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">Hot Prospects</CardTitle>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/10">
+                  <Building2 className="h-4 w-4 text-green-600" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.hotLeads}</div>
+                <p className="text-xs text-muted-foreground">High-priority leads requiring immediate follow-up</p>
               </CardContent>
             </Card>
           </div>
 
           <Tabs defaultValue="recent-calls" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 bg-gradient-to-r from-purple-50 to-blue-50">
+            <TabsList className="grid w-full max-w-lg grid-cols-3 bg-gradient-to-r from-purple-50 to-blue-50">
               <TabsTrigger value="recent-calls" className="text-sm">Recent Calls</TabsTrigger>
-              <TabsTrigger value="analytics" className="text-sm">Call Analytics</TabsTrigger>
+              <TabsTrigger value="potential-leads" className="text-sm">Potential Leads</TabsTrigger>
+              <TabsTrigger value="analytics" className="text-sm">Analytics</TabsTrigger>
             </TabsList>
             <TabsContent value="recent-calls" className="border-none p-0 pt-6">
               <Card className="shadow-md">
@@ -224,6 +239,16 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <RecentCallsTable callData={callData} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="potential-leads" className="border-none p-0 pt-6">
+              <Card className="shadow-md">
+                <CardHeader className="bg-gradient-to-r from-emerald-100 via-green-50 to-teal-100">
+                  <CardTitle>Potential Leads for Follow-up</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PotentialLeadsTable />
                 </CardContent>
               </Card>
             </TabsContent>
