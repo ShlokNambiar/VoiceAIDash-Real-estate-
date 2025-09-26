@@ -104,7 +104,18 @@ const potentialLeadsData: PotentialLead[] = [
   { serialNo: 87, customerName: "BHAVIK NAVINCHAND SURANA", phoneNumber: "7678089019", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
   { serialNo: 88, customerName: "VIJAYALAXMI GANGADHAR MEHERWADE", phoneNumber: "9324622421", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Low initial interest. Potential for future engagement." },
   { serialNo: 89, customerName: "JAYSHREE BALKISHAN SOLANKI", phoneNumber: "8655320799", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
-  { serialNo: 90, customerName: "VINOD KUMAR NANALAL DANGI", phoneNumber: "9930673848", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." }
+  { serialNo: 90, customerName: "VINOD KUMAR NANALAL DANGI", phoneNumber: "9930673848", callDate: "23/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Call completed but transcript unavailable. Requires follow-up." },
+  // New leads added on 26/09/2025
+  { serialNo: 91, customerName: "ABDULQADIR JAFFAR POONAWALA", phoneNumber: "9004344408", callDate: "24/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 92, customerName: "VINAYA GANESH KADAM", phoneNumber: "9619982586", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 93, customerName: "RAMESH R PALAN", phoneNumber: "9145036333", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 94, customerName: "SURESH HARICHANDRA PATIL", phoneNumber: "9820379196", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 95, customerName: "Mona Sandeep Solanki", phoneNumber: "9920400480", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 96, customerName: "Santosh Lallan Singh", phoneNumber: "9821520983", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 97, customerName: "Daksha Anil Mewada", phoneNumber: "9082306237", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 98, customerName: "JITENDRA UTTAMCHAND AHUJA", phoneNumber: "9207288764", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 99, customerName: "Manish Milind Gamre", phoneNumber: "7208729118", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." },
+  { serialNo: 100, customerName: "Omprakash Shankar Chauhan", phoneNumber: "7506195173", callDate: "26/09/2025", followUpStatus: "PENDING CALLBACK", agentNotes: "Recent lead from Exotel call. Requires follow-up." }
 ]
 
 export function PotentialLeadsTable() {
@@ -220,7 +231,7 @@ export function PotentialLeadsTable() {
         <div className="border-t border-gray-100 bg-gradient-to-r from-emerald-50/50 to-green-50/50 px-6 py-3">
           <div className="flex items-center justify-between text-sm">
             <div className="text-gray-600">
-              Total <strong>{potentialLeadsData.length}</strong> potential leads (including 50 new leads from 23/09/2025)
+              Total <strong>{potentialLeadsData.length}</strong> potential leads (including 50 from 23/09/2025 + 10 from 26/09/2025)
             </div>
             <div className="text-gray-500 text-xs">
               Updated {new Date().toLocaleTimeString()}
